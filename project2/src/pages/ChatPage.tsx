@@ -38,8 +38,9 @@ export default function ChatPage() {
 
   const selectedConversation = getCurrentConversation();
   const messages = getCurrentMessages();
+   // Always use user?.id for expert mode to match assignedExpertId which is set to user?.id
   const currentExpert =
-    mode === 'expert' ? expertProfile?.userId || user?.id : user?.username;
+    mode === 'expert' ? user?.id : user?.username;
 
   const handleModeToggle = () => {
     setMode(mode === 'user' ? 'expert' : 'user');

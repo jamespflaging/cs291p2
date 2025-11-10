@@ -223,13 +223,11 @@ export class ApiChatService implements ChatService {
     //
     // See API_SPECIFICATION.md for endpoint details
 
-    const res = await this.makeRequest<{expertProfile: ExpertProfile}>("/expert/profile",
+    return await this.makeRequest<ExpertProfile>("/expert/profile",
       {
         method: "GET",
       }
     )
-    
-    return res.expertProfile
   }
 
   async updateExpertProfile(
@@ -242,14 +240,12 @@ export class ApiChatService implements ChatService {
     //
     // See API_SPECIFICATION.md for endpoint details
 
-    const res = await this.makeRequest<{expertProfile: ExpertProfile}>("/expert/profile",
+    return await this.makeRequest<ExpertProfile>("/expert/profile",
       {
         method: "PUT",
         body: JSON.stringify(request)
       }
     )
-    
-    return res.expertProfile
   }
 
   async getExpertAssignmentHistory(): Promise<ExpertAssignment[]> {

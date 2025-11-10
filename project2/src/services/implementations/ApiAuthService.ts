@@ -137,7 +137,7 @@ export class ApiAuthService implements AuthService {
     // See API_SPECIFICATION.md for endpoint details
 
     try {
-      return await this.makeRequest<User>("/auth/me", {method: "POST"})
+      return await this.makeRequest<User>("/auth/me", {method: "GET"})
     }
     catch {
       this.tokenManager.clearToken()

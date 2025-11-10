@@ -168,8 +168,6 @@ export class ApiPollingUpdateService implements UpdateService {
     if (this.conversationCallbacks.size === 0) return;
 
     try {
-      // In a real implementation, this would make an API call
-      // For now, we'll simulate checking for updates
       const updates = await this.fetchConversationUpdates();
 
       let latestTimestamp = this.state.lastConversationUpdate;
@@ -183,7 +181,6 @@ export class ApiPollingUpdateService implements UpdateService {
           }
         });
 
-        // Track the latest conversation update timestamp
         if (
           !latestTimestamp ||
           new Date(conversation.updatedAt) > new Date(latestTimestamp)
@@ -192,7 +189,6 @@ export class ApiPollingUpdateService implements UpdateService {
         }
       }
 
-      // Update the last conversation update timestamp
       if (
         latestTimestamp &&
         latestTimestamp !== this.state.lastConversationUpdate
@@ -209,7 +205,6 @@ export class ApiPollingUpdateService implements UpdateService {
     if (this.messageCallbacks.size === 0) return;
 
     try {
-      // In a real implementation, this would make an API call
       const updates = await this.fetchMessageUpdates();
 
       let latestTimestamp = this.state.lastMessageUpdate;
@@ -223,7 +218,6 @@ export class ApiPollingUpdateService implements UpdateService {
           }
         });
 
-        // Track the latest message timestamp
         if (
           !latestTimestamp ||
           new Date(message.timestamp) > new Date(latestTimestamp)
@@ -232,7 +226,6 @@ export class ApiPollingUpdateService implements UpdateService {
         }
       }
 
-      // Update the last message update timestamp
       if (latestTimestamp && latestTimestamp !== this.state.lastMessageUpdate) {
         this.state.lastMessageUpdate = latestTimestamp;
       }
@@ -246,7 +239,6 @@ export class ApiPollingUpdateService implements UpdateService {
     if (this.expertQueueCallbacks.size === 0) return;
 
     try {
-      // In a real implementation, this would make an API call
       const updates = await this.fetchExpertQueueUpdates();
 
       let latestTimestamp = this.state.lastExpertQueueUpdate;
@@ -260,8 +252,6 @@ export class ApiPollingUpdateService implements UpdateService {
           }
         });
 
-        // For expert queue, we'll use the current timestamp since it doesn't have a single timestamp
-        // In a real implementation, the queue might have a lastUpdated field
         const currentTimestamp = new Date().toISOString();
         if (
           !latestTimestamp ||
@@ -271,7 +261,6 @@ export class ApiPollingUpdateService implements UpdateService {
         }
       }
 
-      // Update the last expert queue update timestamp
       if (
         latestTimestamp &&
         latestTimestamp !== this.state.lastExpertQueueUpdate
@@ -284,7 +273,6 @@ export class ApiPollingUpdateService implements UpdateService {
     }
   }
 
-  // API methods with actual HTTP requests
   private async fetchConversationUpdates(): Promise<Conversation[]> {
     const token = this.tokenManager.getToken();
     if (!this.state.userId || !token) {
@@ -295,11 +283,9 @@ export class ApiPollingUpdateService implements UpdateService {
     }
 
     try {
-      const sinceParam = this.state.lastConversationUpdate
-        ? `?since=${this.state.lastConversationUpdate}&userId=${this.state.userId}`
-        : `?userId=${this.state.userId}`;
+      const queryParam = `?expertId=${this.state.userId}`;
 
-      const url = `${this.config.baseUrl}/api/conversations/updates${sinceParam}`;
+      const url = `${this.config.baseUrl}/api/conversations/updates${queryParam}`;
 
       const response = await fetch(url, {
         method: 'GET',
@@ -307,7 +293,7 @@ export class ApiPollingUpdateService implements UpdateService {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        credentials: 'include', // Include cookies
+        credentials: 'include',
       });
 
       if (!response.ok) {
@@ -361,19 +347,17 @@ export class ApiPollingUpdateService implements UpdateService {
 
   private async fetchExpertQueueUpdates(): Promise<ExpertQueue[]> {
     const token = this.tokenManager.getToken();
-    if (!this.state.userId || !token || this.state.userRole !== 'expert') {
+    if (!this.state.userId || !token) {
       console.warn(
-        'ApiPollingUpdateService: Expert queue polling requires expert role'
+        'ApiPollingUpdateService: Expert queue polling missing user context or auth token'
       );
       return [];
     }
 
     try {
-      const sinceParam = this.state.lastExpertQueueUpdate
-        ? `?since=${this.state.lastExpertQueueUpdate}&expertId=${this.state.userId}`
-        : `?expertId=${this.state.userId}`;
+      const queryParam = `?expertId=${this.state.userId}`;
 
-      const url = `${this.config.baseUrl}/api/expert-queue/updates${sinceParam}`;
+      const url = `${this.config.baseUrl}/api/expert-queue/updates${queryParam}`;
 
       const response = await fetch(url, {
         method: 'GET',

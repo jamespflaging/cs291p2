@@ -40,7 +40,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       try {
         // Get current user from AuthService
-        const currentUser = await authService.getCurrentUser();
+        const currentUser = await authService.refreshToken();
         setUser(currentUser);
       } catch (err) {
         console.error('Failed to initialize auth:', err);
